@@ -14,8 +14,28 @@ var articles = [
     { title: 'Brian Hague founds the Daily Planet', body: 'Wow! Amazing! Such good news!' }
 ];
 
-app.get('/', function(req, res) {
-    res.render('index');
+app.delete('/articles/:id', function(req,res){
+    var articleDelete = req.params.id;
+    articles = JSON.parse(articles);
+    articles = articles.filter(function(item){
+        return (item.articles !== articleDelete);
+    });
+  //   fs.writeFileSync('./data.json', JSON.stringify(animals));
+  // res.send({message: 'success'});
+});
+
+app.get('/article/:index', function(req,res){
+    var index = parseInt(req.params.index);
+    if (index < articles.length && index >= 0) {
+        res.render('articles/show', {article: articles[req.params.index], idx: req.params.id });
+    } else {
+        res.send('Error');
+    }
+});
+
+app.post('/articles', function(req, res) {
+    articles.push(req.body);
+    res.redirect('/articles');
 });
 
 app.get('/articles', function(req, res) {
@@ -35,13 +55,18 @@ app.get('/articles/:index', function(req, res) {
     }
 });
 
-app.post('/articles', function(req, res) {
-    articles.push(req.body);
-    res.redirect('/articles');
-});
-
 app.get('/about', function(req, res) {
     res.render('about');
+});
+
+app.get('/articles/edit/:id', function(req, res) {
+    res.render('articles/edit', { article: articles[req.params.id] });
+
+app.put('/article/:id/edit', function(req,res){
+    var articleId = parseInt(req.params.id);
+    articles[articleId].title = req.body.title;
+    articles[articleId].body = req.body.body;
+    res.send({message: 'success'});
 });
 
 app.listen(3000, function() {
